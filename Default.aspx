@@ -8,7 +8,8 @@
 </head>
 <body>
     <form id="form1" runat="server">
-    <asp:TextBox ID="TextBox1" runat="server" Height="27px" Width="416px"></asp:TextBox>
+    <asp:Label ID="Label1" runat="server" Text="網頁網址"></asp:Label>
+    <asp:TextBox ID="TextBox1" runat="server" Height="16px" Width="416px"></asp:TextBox>
     <br />
     <asp:Button ID="Button1" runat="server" Text="輸出成txt" />
     <asp:Button ID="Button2" runat="server" Text="輸出成excel" />
