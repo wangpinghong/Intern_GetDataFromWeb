@@ -8,9 +8,10 @@
 </head>
 <body>
     <form id="form1" runat="server">
-    <asp:Button ID="Button1" runat="server" Text="Button" />
+    <asp:TextBox ID="TextBox1" runat="server" Height="27px" Width="416px"></asp:TextBox>
     <br />
-    <asp:Label ID="Label1" runat="server"></asp:Label>
+    <asp:Button ID="Button1" runat="server" Text="輸出成txt" />
+    <asp:Button ID="Button2" runat="server" Text="輸出成excel" />
     <br />
     </form>
 </body>
