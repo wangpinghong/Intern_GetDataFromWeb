@@ -15,8 +15,10 @@
     </asp:ListBox>
     <br />
     <asp:Label ID="Label2" runat="server" Text="loading"></asp:Label>
+    <asp:Button ID="Button3" runat="server" Text="Button" />
     <p>
-    <asp:Button ID="Button1" runat="server" Text="輸出成txt" />
+    <asp:Button ID="Button1" runat="server" Text="全部輸出成txt" />
+        <asp:Button ID="Button2" runat="server" Text="選取輸出成txt" />
     </p>
     </form>
 </body>
