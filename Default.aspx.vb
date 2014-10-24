@@ -9,15 +9,29 @@ Partial Class _Default
     Private Property a As Integer
     Private Property b As Integer
     '寫成TXT檔
+    Private Property url As String
     Dim file As System.IO.StreamWriter
+    Dim itemIndex As Integer = 0
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        '讀進要抓的網址
         readFile()
     End Sub
 
     Protected Sub Button1_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles Button1.Click
+        getWeb()
+        '把得到的資料轉成txt
+        outputFile()
+    End Sub
+    '抓取名字
+    Public Function getWeb()
+        Dim curItem As String = ListBox1.SelectedItem.ToString()
+        url = curItem
+    End Function
+    '將得到的資料轉成txt
+    Public Function outputFile()
         '資料網址
-        Dim request As HttpWebRequest = WebRequest.Create(TextBox2.Text)
+        Dim request As HttpWebRequest = WebRequest.Create(url)
         Dim mResponse As HttpWebResponse = request.GetResponse()
         Dim sr As New StreamReader(mResponse.GetResponseStream, Encoding.GetEncoding("big5"))
         file = My.Computer.FileSystem.OpenTextFileWriter("C:\Users\品閎\Desktop\test1.txt", True)
@@ -25,7 +39,9 @@ Partial Class _Default
             '迴圈讀data
             Do Until sr.EndOfStream
                 Dim strContent = sr.ReadLine().ToString
+                '得到日期
                 getDate(strContent)
+                '得到匯率
                 getRate(strContent)
                 file.Flush()
             Loop
@@ -35,12 +51,6 @@ Partial Class _Default
         sr.Close()
         request = Nothing
         mResponse = Nothing
-    End Sub
-    Protected Sub Button2_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles Button2.Click
-    End Sub
-    '抓取名字
-    Public Function getName(ByVal str)
-
     End Function
     '刪除html格式的function
     Public Function deHtml(ByVal str, ByVal startindex, ByVal endindex)
@@ -83,20 +93,22 @@ Partial Class _Default
             ans = deHtml(str.ToString(), ">", "<")
             '得到匯率
             file.WriteLine(ans)
-            'ElseIf rateRe2.IsMatch(str.ToString) Then
-            '    Dim ans As String
-            '    ans = deHtml(str.ToString(), ">", "<")
-            '    '得到匯率
-            '    file.WriteLine(ans)
         End If
     End Function
+    '讀取網頁位置
     Public Function readFile()
         Dim str As IO.StreamReader = New IO.StreamReader("C:\Users\品閎\Desktop\web.txt", System.Text.Encoding.Default)
         Do Until str.EndOfStream
+            '將讀到的資料存成listboxitems
             ListBox1.Items.Add(str.ReadLine)
         Loop
         str.Close()
-        'ListBox1.Items.Add("1")
-        'ListBox1.Items.Add("2")
     End Function
+    Private Sub listBox1_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ListBox1.SelectedIndexChanged
+    End Sub
+
+    Private Sub Listbox1_DblClick()
+        Dim curItem As String = ListBox1.SelectedItem.ToString()
+        Label2.Text = curItem
+    End Sub
 End Class
