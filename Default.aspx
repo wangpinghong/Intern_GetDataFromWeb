@@ -8,11 +8,14 @@
 </head>
 <body>
     <form id="form1" runat="server">
-    <asp:Label ID="Label1" runat="server" Text="網頁網址"></asp:Label>
-    <asp:TextBox ID="TextBox1" runat="server" Height="16px" Width="416px"></asp:TextBox>
+    <asp:Label ID="Label1" runat="server" Text="網頁位置"></asp:Label>
+    <asp:TextBox ID="TextBox2" runat="server"></asp:TextBox>
+    <asp:Button ID="Button2" runat="server" Text="enter" />
     <br />
+    <asp:ListBox ID="ListBox1" runat="server" Height="203px" Width="223px">
+        <asp:ListItem></asp:ListItem>
+    </asp:ListBox>
     <asp:Button ID="Button1" runat="server" Text="輸出成txt" />
-    <asp:Button ID="Button2" runat="server" Text="輸出成excel" />
     <br />
     </form>
 </body>

@@ -12,15 +12,15 @@ Partial Class _Default
     Dim file As System.IO.StreamWriter
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-     
+        readFile()
     End Sub
 
     Protected Sub Button1_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles Button1.Click
         '資料網址
-        Dim request As HttpWebRequest = WebRequest.Create(TextBox1.Text)
+        Dim request As HttpWebRequest = WebRequest.Create(TextBox2.Text)
         Dim mResponse As HttpWebResponse = request.GetResponse()
         Dim sr As New StreamReader(mResponse.GetResponseStream, Encoding.GetEncoding("big5"))
-        file = My.Computer.FileSystem.OpenTextFileWriter("C:\Users\品閎\Desktop\test.txt", True)
+        file = My.Computer.FileSystem.OpenTextFileWriter("C:\Users\品閎\Desktop\test1.txt", True)
         Try
             '迴圈讀data
             Do Until sr.EndOfStream
@@ -37,7 +37,6 @@ Partial Class _Default
         mResponse = Nothing
     End Sub
     Protected Sub Button2_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles Button2.Click
-       
     End Sub
     '抓取名字
     Public Function getName(ByVal str)
@@ -84,12 +83,20 @@ Partial Class _Default
             ans = deHtml(str.ToString(), ">", "<")
             '得到匯率
             file.WriteLine(ans)
-        ElseIf rateRe2.IsMatch(str.ToString) Then
-            Dim ans As String
-            ans = deHtml(str.ToString(), ">", "<")
-            '得到匯率
-            file.WriteLine(ans)
+            'ElseIf rateRe2.IsMatch(str.ToString) Then
+            '    Dim ans As String
+            '    ans = deHtml(str.ToString(), ">", "<")
+            '    '得到匯率
+            '    file.WriteLine(ans)
         End If
     End Function
-
+    Public Function readFile()
+        Dim str As IO.StreamReader = New IO.StreamReader("C:\Users\品閎\Desktop\web.txt", System.Text.Encoding.Default)
+        Do Until str.EndOfStream
+            ListBox1.Items.Add(str.ReadLine)
+        Loop
+        str.Close()
+        'ListBox1.Items.Add("1")
+        'ListBox1.Items.Add("2")
+    End Function
 End Class
