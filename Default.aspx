@@ -10,16 +10,17 @@
     <form id="form1" runat="server">
     <asp:Label ID="Label1" runat="server" Text="網頁位置"></asp:Label>
     <br />
-    <asp:ListBox ID="ListBox1" runat="server" Height="203px" Width="223px">
-        <asp:ListItem></asp:ListItem>
+    <asp:ListBox ID="ListBox1" runat="server" Height="203px" Width="223px" 
+        ForeColor="Black" SelectionMode="Multiple">
     </asp:ListBox>
     <br />
-    <asp:Label ID="Label2" runat="server" Text="loading"></asp:Label>
-    <asp:Button ID="Button3" runat="server" Text="Button" />
+    <asp:Button ID="Button3" runat="server" Text="網站位置" />
     <p>
     <asp:Button ID="Button1" runat="server" Text="全部輸出成txt" />
         <asp:Button ID="Button2" runat="server" Text="選取輸出成txt" />
     </p>
+    <asp:ListBox ID="ListBox2" runat="server" Height="499px" Width="1021px">
+    </asp:ListBox>
     </form>
 </body>
 </html>
