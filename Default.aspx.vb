@@ -4,60 +4,53 @@ Imports System.Net
 Imports System.IO 'StreamReader類
 Imports System.Text.RegularExpressions
 Partial Class _Default
-
     Inherits System.Web.UI.Page
-    Private Property a As Integer
-    Private Property b As Integer
-    '寫成TXT檔
-    Private Property url As String
     Dim file As System.IO.StreamWriter
     Dim itemIndex As Integer = 0
-    Dim curItem As String
-    Dim patternDate As String = "\d{4}/\d{1,2}/\d{1,2}"
-    Dim patternDate2 As String = "\d{1,2}/\d{1,2}"
-    Dim patternRate As String = "\d{1,3}.\d{1,7}"
-    Dim dbCheck As Boolean
+    Dim cur_Item As String
+    Dim patternDate As String = "\d{4}/\d{1,2}/\d{1,2}" 'date type 2014/01/01
+    Dim patternDate2 As String = "\d{1,2}/\d{1,2}" ' date type 01/01
+    Dim patternRate As String = "\d{1,3}.\d{1,7}" 'rate type
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
     End Sub
     '全部output的button
     Protected Sub Button1_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles Button1.Click
+        'output檔案
         For l_index As Integer = 0 To ListBox1.Items.Count - 1
-            '得到網址
-            getWeb(ListBox1.Items(l_index).ToString)
-            '把得到的資料轉成txt
-            outputFile(l_index, "C:\Users\品閎\Desktop\")
+            getWeb(ListBox1.Items(l_index).ToString) '按序得到網址
+            newFile(l_index, "C:\Users\品閎\Desktop\") '創造新的檔案
+            getWebContent(l_index, "C:\Users\品閎\Desktop\") '得到內容
+            file.Close()
         Next
         GC.Collect()
-    End Sub
-    '選取output的button
-    Protected Sub Button2_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles Button2.Click
     End Sub
     '讀取網站資料
     Protected Sub Button3_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles Button3.Click
         readFile(ListBox1, "C:\Users\品閎\Desktop\web")
     End Sub
-    '抓取名字
+    '得到網址名稱
     Private Sub getWeb(ByVal str As String)
         Try
-            curItem = str
+            cur_Item = str
         Catch ex As Exception
             MsgBox("請選擇要開始的網址")
         End Try
     End Sub
-    '將得到的資料輸出成txt檔
-    Public Sub outputFile(ByVal index As Integer, ByVal cur_path As String)
-        Dim request As HttpWebRequest = WebRequest.Create(curItem)
-        Dim mResponse As HttpWebResponse = request.GetResponse()
-
-        Dim sr As New StreamReader(mResponse.GetResponseStream, Encoding.GetEncoding("big5"))
+    Private Sub newFile(ByVal index As Integer, ByVal cur_path As String)
         file = My.Computer.FileSystem.OpenTextFileWriter(cur_path & index & ".txt", True)
+    End Sub
+    '將得到的資料輸出成txt檔
+    Public Sub getWebContent(ByVal index As Integer, ByVal cur_path As String)
+        '讀取網頁內容
+        Dim request As HttpWebRequest = WebRequest.Create(cur_Item)
+        Dim mResponse As HttpWebResponse = request.GetResponse()
+        Dim sr As New StreamReader(mResponse.GetResponseStream, Encoding.GetEncoding("big5"))
         Try
             '判斷是否有符合格式
             match(sr)
         Catch ex As Exception
         End Try
-        file.Close()
         sr.Close()
         request = Nothing
         mResponse = Nothing
@@ -106,7 +99,7 @@ Partial Class _Default
         Catch ex As Exception
         End Try
     End Sub
-
+    'output符合資料的檔案
     Private Sub typeDate1(ByVal mDate As Match, ByVal mRate As Match)
         If mDate.Success And mRate.Success Then
             file.WriteLine(mDate)
@@ -119,7 +112,8 @@ Partial Class _Default
             file.WriteLine(mRate)
         End If
     End Sub
-    Private Function checkRate(ByVal sr As StreamReader,dbCheck As Boolean)
+    '檢查是否有符合日期和匯率的格式
+    Private Function checkRate(ByVal sr As StreamReader, ByVal dbCheck As Boolean)
         Dim rRate As Regex = New Regex(patternRate, RegexOptions.IgnoreCase)
         Dim mRate As Match
         mRate = rRate.Match(sr.ReadLine)
@@ -129,4 +123,5 @@ Partial Class _Default
             Return mRate.Success
         End If
     End Function
+
 End Class
