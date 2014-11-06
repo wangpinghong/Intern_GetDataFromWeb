@@ -8,8 +8,8 @@ Partial Class _Default
     Dim file As System.IO.StreamWriter
     Dim itemIndex As Integer = 0
     Dim cur_Item As String
-    Dim patternType As String = "\d{4}/\d{1,2}/\d{1,2}.{0,}\n.{0,}\d{1,3}.\d{1,7}" 'type1 date:2014/01/01,rate:~.~
-    Dim patternType2 As String = "\d{1,2}/\d{1,2}.{0,}\n.{0,}\d{1,3}.\d{1,7}" 'type2 date:01/01,rate:~.~
+    Dim patternType As String = "(?<date>\d{4}/\d{1,2}/\d{1,2}).{0,}.*\n.*(?<rate>\d{1,3}\.\d{1,7})"   'type1 date:2014/01/01,rate:~.~
+    Dim patternType2 As String = "(?<date2>\d{1,2}/\d{1,2}).{0,}.*\n.*(?<rate>\d{1,3}\.\d{1,7})" 'type2 date:01/01,rate:~.~
     Dim patternDate As String = "\d{4}/\d{1,2}/\d{1,2}" 'date  2014/01/01
     Dim patternDate2 As String = "\d{1,2}/\d{1,2}" ' date  01/01
     Dim patternRate As String = "\d{1,3}\.\d{1,7}" 'rate 
@@ -79,31 +79,28 @@ Partial Class _Default
             Dim type As Integer
             '先將資料讀進來
             Dim text = sr.ReadToEnd.ToString
-            '判斷讀進來的網頁是否為tpye1
-            Dim mcDate As MatchCollection = rType.Matches(text)
-            '判斷讀進來的網頁是否為type2
-            If mcDate.Count = 0 Then
-                mcDate = rType2.Matches(text)
-                type = 2
-            Else
+            '判斷讀進來的網頁為何種 type
+            Dim mcType As MatchCollection = rType.Matches(text)
+            If rType.Match(text).Success Then
                 type = 1
+            Else
+                type = 2
+                mcType = rType2.Matches(text)
             End If
-            '將這兩行中個別的資料取出來
-            For Each m As Match In mcDate
-                getDate(m, type)
-                getRate(m)
+            '分別寫進去
+            For Each m In mcType
+                Dim groups As GroupCollection = m.Groups
+                output_Date_Rate(m, type, groups)
             Next
         Catch ex As Exception
         End Try
     End Sub
     '篩選日期格式
-    Private Sub getDate(ByVal m As Match, ByVal int As Integer)
-        If int = 1 Then
-            mDate = rDate.Match(m.ToString)
-            file.WriteLine(mDate)
-        ElseIf int = 2 Then
-            mDate2 = rDate2.Match(m.ToString)
-            file.WriteLine(mDate2)
+    Private Sub output_Date_Rate(ByVal m As Match, ByVal type As Integer, ByVal g As GroupCollection)
+        If type = 1 Then
+            file.WriteLine("date:'{0}'   rate:'{1}'", g.Item("date").Value, g.Item("rate").Value)
+        ElseIf type = 2 Then
+            file.WriteLine("date:'{0}'   rate:'{1}'", g.Item("date2").Value, g.Item("rate").Value)
         End If
     End Sub
     '篩選匯率格式
