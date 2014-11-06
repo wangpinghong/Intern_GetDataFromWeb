@@ -8,9 +8,17 @@ Partial Class _Default
     Dim file As System.IO.StreamWriter
     Dim itemIndex As Integer = 0
     Dim cur_Item As String
-    Dim patternDate As String = "\d{4}/\d{1,2}/\d{1,2}" 'date type 2014/01/01
-    Dim patternDate2 As String = "\d{1,2}/\d{1,2}" ' date type 01/01
-    Dim patternRate As String = "\d{1,3}.\d{1,7}" 'rate type
+    Dim patternType As String = "\d{4}/\d{1,2}/\d{1,2}.{0,}\n.{0,}\d{1,3}.\d{1,7}" 'type1 date:2014/01/01,rate:~.~
+    Dim patternType2 As String = "\d{1,2}/\d{1,2}.{0,}\n.{0,}\d{1,3}.\d{1,7}" 'type2 date:01/01,rate:~.~
+    Dim patternDate As String = "\d{4}/\d{1,2}/\d{1,2}" 'date  2014/01/01
+    Dim patternDate2 As String = "\d{1,2}/\d{1,2}" ' date  01/01
+    Dim patternRate As String = "\d{1,3}\.\d{1,7}" 'rate 
+    Dim mDate, mRate, mdate2 As Match
+    Dim rDate As Regex = New Regex(patternDate, RegexOptions.IgnoreCase)
+    Dim rDate2 As Regex = New Regex(patternDate2, RegexOptions.IgnoreCase)
+    Dim rRate As Regex = New Regex(patternRate, RegexOptions.IgnoreCase)
+    Dim rType As Regex = New Regex(patternType, RegexOptions.IgnoreCase)
+    Dim rType2 As Regex = New Regex(patternType2, RegexOptions.IgnoreCase)
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
     End Sub
@@ -68,60 +76,39 @@ Partial Class _Default
     '判斷是否有符合要求格式
     Private Sub match(ByVal sr As StreamReader)
         Try
-            ' 定義RE
-            Dim rDate As Regex = New Regex(patternDate, RegexOptions.IgnoreCase)
-            Dim rDate2 As Regex = New Regex(patternDate2, RegexOptions.IgnoreCase)
-            Dim rRate As Regex = New Regex(patternRate, RegexOptions.IgnoreCase)
-            ''定義判斷參數
-            Dim fir = sr.ReadLine, sec = sr.ReadLine
-            '讀取網頁至結尾
-            Dim mDate, mDate2, mRate As Match
-            Do
-                '讓他隔行讀取，並非單雙行讀取
-                mDate = rDate.Match(fir)
-                mDate2 = rDate2.Match(fir)
-                mRate = rRate.Match(sec)
-                '判斷日期格式
-                If mDate.Success And mRate.Success Then
-                    typeDate1(mDate, mRate)
-                ElseIf mDate2.Success And mRate.Success Then
-                    typeDate2(mDate2, mRate)
-                End If
-                ''判斷日期格式
-                'typeDate1(mDate, mRate)
-                'typeDate2(mDate2, mRate)
-                '抓取下一個符合格式的
-                mDate = mDate.NextMatch()
-                mDate2 = mDate2.NextMatch()
-                fir = sec
-                sec = sr.ReadLine
-            Loop Until sr.EndOfStream
+            Dim type As Integer
+            '先將資料讀進來
+            Dim text = sr.ReadToEnd.ToString
+            '判斷讀進來的網頁是否為tpye1
+            Dim mcDate As MatchCollection = rType.Matches(text)
+            '判斷讀進來的網頁是否為type2
+            If mcDate.Count = 0 Then
+                mcDate = rType2.Matches(text)
+                type = 2
+            Else
+                type = 1
+            End If
+            '將這兩行中個別的資料取出來
+            For Each m As Match In mcDate
+                getDate(m, type)
+                getRate(m)
+            Next
         Catch ex As Exception
         End Try
     End Sub
-    'output符合資料的檔案
-    Private Sub typeDate1(ByVal mDate As Match, ByVal mRate As Match)
-        If mDate.Success And mRate.Success Then
+    '篩選日期格式
+    Private Sub getDate(ByVal m As Match, ByVal int As Integer)
+        If int = 1 Then
+            mDate = rDate.Match(m.ToString)
             file.WriteLine(mDate)
-            file.WriteLine(mRate)
+        ElseIf int = 2 Then
+            mDate2 = rDate2.Match(m.ToString)
+            file.WriteLine(mDate2)
         End If
     End Sub
-    Private Sub typeDate2(ByVal mDate As Match, ByVal mRate As Match)
-        If mDate.Success And mRate.Success Then
-            file.WriteLine(mDate)
-            file.WriteLine(mRate)
-        End If
+    '篩選匯率格式
+    Private Sub getRate(ByVal m As Match)
+        mRate = rRate.Match(m.ToString)
+        file.WriteLine(mRate)
     End Sub
-    '檢查是否有符合日期和匯率的格式
-    Private Function checkRate(ByVal sr As StreamReader, ByVal dbCheck As Boolean)
-        Dim rRate As Regex = New Regex(patternRate, RegexOptions.IgnoreCase)
-        Dim mRate As Match
-        mRate = rRate.Match(sr.ReadLine)
-        If dbCheck Then
-            Return rRate
-        Else
-            Return mRate.Success
-        End If
-    End Function
-
 End Class
